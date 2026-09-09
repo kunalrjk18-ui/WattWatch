@@ -1,63 +1,10 @@
-const appliances=[
-{name:"Air Conditioner",icon:"❄️",power:1.42,energy:3.10,on:true},
-{name:"Refrigerator",icon:"🧊",power:.18,energy:1.21,on:true},
-{name:"Ceiling Fan",icon:"🌀",power:.07,energy:.84,on:true},
-{name:"Lights",icon:"💡",power:.12,energy:.62,on:true},
-{name:"Desktop PC",icon:"🖥️",power:.21,energy:.73,on:true},
-{name:"Television",icon:"📺",power:0,energy:.42,on:false},
-{name:"Washing Machine",icon:"🧺",power:0,energy:.21,on:false},
-{name:"Microwave",icon:"🍽️",power:0,energy:.07,on:false},
-{name:"Water Heater",icon:"🚿",power:0,energy:.06,on:false}
-];
-
-const pages={dashboard:"Electricity Dashboard",appliances:"Appliance Monitor",analytics:"Usage Analytics",alerts:"Energy Alerts",saving:"Energy Saving Center"};
-document.querySelectorAll(".nav").forEach(b=>b.onclick=()=>showPage(b.dataset.page));
-function showPage(id){
- document.querySelectorAll(".page").forEach(p=>p.classList.remove("active-page"));
- document.getElementById(id).classList.add("active-page");
- document.querySelectorAll(".nav").forEach(n=>n.classList.toggle("active",n.dataset.page===id));
- document.getElementById("pageTitle").textContent=pages[id];
- if(id==="analytics") setTimeout(()=>drawWeekly(),50);
-}
-function renderAppliances(){
- const box=document.getElementById("applianceGrid");
- box.innerHTML=appliances.map((a,i)=>`<article class="app-card ${a.on?"":"off"}">
- <div class="app-top"><div class="app-icon">${a.icon}</div><div class="switch" onclick="toggleApp(${i})"></div></div>
- <h3>${a.name}</h3><p>${a.on?"Currently running":"Currently off"}</p>
- <div class="powerline"><span>Power draw</span><b>${a.power.toFixed(2)} kW</b></div>
- <div class="powerline"><span>Today's energy</span><b>${a.energy.toFixed(2)} kWh</b></div>
- </article>`).join("");
-}
-function toggleApp(i){
- appliances[i].on=!appliances[i].on;
- appliances[i].power=appliances[i].on?(i===0?1.42:i===1?.18:i===2?.07:i===3?.12:i===4?.21:0):0;
- renderAppliances(); updateDashboard();
-}
-function addAppliance(){
- const name=prompt("Appliance name:");
- if(!name)return;
- appliances.push({name,icon:"🔌",power:.1,energy:0,on:true});
- renderAppliances(); updateDashboard();
-}
-function updateDashboard(){
- const active=appliances.filter(a=>a.on);
- const p=active.reduce((s,a)=>s+a.power,0);
- document.getElementById("power").innerHTML=p.toFixed(2)+' <small>kW</small>';
- document.getElementById("activeCount").textContent=active.length;
- const monthly=(7.26/9*30*6.8);
- document.getElementById("bill").textContent="₹"+Math.round(monthly).toLocaleString("en-IN");
-}
-function dismiss(btn){btn.parentElement.remove()}
-function clock(){
- document.getElementById("clock").textContent=new Date().toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"});
-}
-setInterval(clock,1000);clock();renderAppliances();
-
-new Chart(document.getElementById("usageChart"),{type:"line",data:{labels:["8 AM","9","10","11","12 PM","1","2","3","4","5","6","7"],datasets:[{label:"kWh",data:[.34,.42,.48,.61,.55,.49,.58,.64,.72,.81,.94,1.08],tension:.35,borderWidth:2,pointRadius:2}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,grid:{color:"#edf1ef"}},x:{grid:{display:false}}}}});
-new Chart(document.getElementById("applianceChart"),{type:"doughnut",data:{labels:["AC","Refrigerator","Fan","Lights","PC"],datasets:[{data:[3.1,1.21,.84,.62,.73],borderWidth:0}]},options:{cutout:"72%",plugins:{legend:{position:"bottom",labels:{boxWidth:8,font:{size:10}}}}}});
-
-function drawWeekly(){
- if(window.weeklyDone)return;
- window.weeklyDone=true;
- new Chart(document.getElementById("weeklyChart"),{type:"bar",data:{labels:["Mon","Tue","Wed","Thu","Fri","Sat","Sun"],datasets:[{label:"kWh",data:[6.8,7.4,6.2,8.1,7.0,6.3,7.26],borderRadius:7}]},options:{plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,grid:{color:"#edf1ef"}},x:{grid:{display:false}}}}});
-}
+const A=[['Air Conditioner','❄️',1.42,3.10,1],['Refrigerator','🧊',.18,1.21,1],['Ceiling Fan','🌀',.07,.84,1],['Lights','💡',.12,.62,1],['Desktop PC','🖥️',.21,.73,1],['Television','📺',0,.42,0],['Washing Machine','🧺',0,.21,0],['Microwave','🍽️',0,.07,0],['Water Heater','🚿',0,.06,0],['EV Charger','🚗',0,0,0]];
+function page(id,btn){document.querySelectorAll('.view').forEach(x=>x.classList.add('hidden'));document.getElementById(id).classList.remove('hidden');document.getElementById('title').textContent=id==='dashboard'?'Electricity Dashboard':id==='saving'?'Energy Saving Center':id[0].toUpperCase()+id.slice(1)+' Monitor';if(btn){document.querySelectorAll('nav button').forEach(x=>x.classList.remove('active'));btn.classList.add('active')}if(id==='analytics'&&!window.w){window.w=1;new Chart(document.getElementById('week'),{type:'bar',data:{labels:['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],datasets:[{label:'This week',data:[6.8,7.4,6.2,8.1,7,6.3,7.26]},{label:'Last week',data:[7.1,7.8,6.7,8.6,7.5,6.8,7.8]}]},options:{responsive:true,maintainAspectRatio:false}})}}
+function render(){document.getElementById('apps').innerHTML=A.map((a,i)=>`<div class="app"><span style="font-size:27px">${a[1]}</span><button class="switch" onclick="toggle(${i})">${a[4]?'ON':'OFF'}</button><h3>${a[0]}</h3><p>${a[4]?'Currently running':'Currently off'}</p><div class="power">${a[2].toFixed(2)} kW</div><p>${a[3].toFixed(2)} kWh today</p></div>`).join('');let on=A.filter(x=>x[4]).sort((a,b)=>b[2]-a[2]);document.getElementById('active').textContent=on.length;document.getElementById('power').textContent=on.reduce((s,x)=>s+x[2],0).toFixed(2)+' kW';document.getElementById('quick').innerHTML=on.slice(0,4).map(a=>`<div><span style="font-size:22px">${a[1]}</span><b>${a[0]}</b><small>● ${a[2].toFixed(2)} kW · Running</small></div>`).join('')}
+function toggle(i){A[i][4]=A[i][4]?0:1;A[i][2]=A[i][4]?[1.42,.18,.07,.12,.21,0,0,0,0,0][i]:0;render()}
+function add(){let n=prompt('Appliance name:');if(n){A.push([n,'🔌',.1,0,1]);render()}}
+function calc(v){let b=1486,n=Math.round(b*(1-v/100));document.getElementById('pct').textContent=v+'%';document.getElementById('newbill').textContent='₹'+n.toLocaleString('en-IN');document.getElementById('save').textContent='Save ₹'+(b-n).toLocaleString('en-IN')+'/month'}
+setInterval(()=>document.getElementById('clock').textContent=new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}),1000);
+render();calc(22);
+new Chart(document.getElementById('dayChart'),{type:'line',data:{labels:['12 AM','2','4','6','8','10 AM','12 PM','2','4','6','8','10 PM'],datasets:[{label:'kWh',data:[.12,.09,.1,.22,.34,.42,.55,.48,.61,.72,.94,1.08],tension:.35,fill:true}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,title:{display:true,text:'kWh'}},x:{grid:{display:false}}}}});
+new Chart(document.getElementById('pie'),{type:'doughnut',data:{labels:['AC','Refrigerator','Fan','Lights','PC'],datasets:[{data:[3.1,1.21,.84,.62,.73]}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'}}}});

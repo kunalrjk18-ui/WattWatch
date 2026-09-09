@@ -1,110 +1,14 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>WattWatch — Smart Electricity Monitor</title>
-<link rel="stylesheet" href="style.css">
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-</head>
-<body>
-<aside class="sidebar">
-  <div class="brand"><span>⚡</span> WattWatch</div>
-  <p class="tag">Smart Electricity Monitor</p>
-  <nav>
-    <button class="nav active" data-page="dashboard">▦ <span>Dashboard</span></button>
-    <button class="nav" data-page="appliances">🔌 <span>Appliances</span></button>
-    <button class="nav" data-page="analytics">◒ <span>Analytics</span></button>
-    <button class="nav" data-page="alerts">⚠ <span>Alerts</span></button>
-    <button class="nav" data-page="saving">💡 <span>Energy Saving</span></button>
-  </nav>
-  <div class="sidebar-foot">Demo Mode<br><small>Simulated smart-meter data</small></div>
-</aside>
-
-<main>
-<header>
-  <div>
-    <div class="eyebrow">SMART HOME • LIVE MONITORING</div>
-    <h1 id="pageTitle">Electricity Dashboard</h1>
-  </div>
-  <div class="live"><i></i> Live <span id="clock"></span></div>
-</header>
-
-<section id="dashboard" class="page active-page">
-  <div class="cards">
-    <article class="card primary">
-      <div class="label">CURRENT POWER</div>
-      <div class="big" id="power">1.84 <small>kW</small></div>
-      <div class="trend">▲ 8.4% vs yesterday</div>
-    </article>
-    <article class="card">
-      <div class="label">TODAY'S ENERGY</div>
-      <div class="big" id="energy">7.26 <small>kWh</small></div>
-      <div class="muted">Daily target: 10 kWh</div>
-    </article>
-    <article class="card">
-      <div class="label">EST. MONTHLY BILL</div>
-      <div class="big" id="bill">₹1,486</div>
-      <div class="muted">Based on current usage</div>
-    </article>
-    <article class="card">
-      <div class="label">ACTIVE APPLIANCES</div>
-      <div class="big" id="activeCount">5</div>
-      <div class="muted">of 9 registered devices</div>
-    </article>
-  </div>
-
-  <div class="grid2">
-    <article class="panel">
-      <div class="panel-head"><div><h2>Today's Consumption</h2><p>Energy used over the last 12 hours</p></div><span class="pill">kWh</span></div>
-      <canvas id="usageChart"></canvas>
-    </article>
-    <article class="panel">
-      <div class="panel-head"><div><h2>Appliance Breakdown</h2><p>Share of today's estimated usage</p></div></div>
-      <div class="donut-wrap"><canvas id="applianceChart"></canvas><div class="donut-center"><b>7.26</b><small>kWh today</small></div></div>
-    </article>
-  </div>
-
-  <article class="panel">
-    <div class="panel-head"><div><h2>Quick Appliance Status</h2><p>Devices with the highest current draw</p></div><button class="outline" onclick="showPage('appliances')">Manage appliances →</button></div>
-    <div class="device-row" id="quickDevices"></div>
-  </article>
+<!doctype html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WattWatch</title><link rel="stylesheet" href="style.css"><script src="https://cdn.jsdelivr.net/npm/chart.js"></script></head><body>
+<aside><div class="brand">⚡ WattWatch</div><small>SMART ELECTRICITY MONITOR</small><nav><button class="active" onclick="page('dashboard',this)">▦ Dashboard</button><button onclick="page('appliances',this)">🔌 Appliances</button><button onclick="page('analytics',this)">◒ Analytics</button><button onclick="page('saving',this)">💡 Energy Saving</button></nav><footer>Demo Mode<br><small>Simulated smart-meter data</small></footer></aside>
+<main><header><div><label>SMART HOME • LIVE MONITORING</label><h1 id="title">Electricity Dashboard</h1></div><div class="live">● LIVE <span id="clock"></span></div></header>
+<section id="dashboard" class="view">
+<div class="cards"><div class="card dark"><small>CURRENT POWER</small><strong id="power">2.00 kW</strong><em>▲ 8.4% vs yesterday</em></div><div class="card"><small>TODAY'S ENERGY</small><strong>7.26 kWh</strong><p>Daily target: 10 kWh</p></div><div class="card"><small>EST. MONTHLY BILL</small><strong>₹1,486</strong><p>Approx. at ₹6.80/kWh</p></div><div class="card"><small>ACTIVE APPLIANCES</small><strong id="active">6</strong><p>of 10 devices</p></div></div>
+<div class="insights"><div>🔥 <b>Peak load<br>8:00 PM · 3.42 kW</b></div><div>🎯 <b>Target status<br>72.6% of daily target</b></div><div>💸 <b>Saving opportunity<br>Up to ₹335/month</b></div></div>
+<div class="grid"><article class="panel"><h2>24-Hour Consumption</h2><p>Hourly electricity usage · kWh</p><div class="chart"><canvas id="dayChart"></canvas></div></article><article class="panel"><h2>Usage by Appliance</h2><p>Share of today's energy</p><div class="chart"><canvas id="pie"></canvas></div></article></div>
+<div class="grid"><article class="panel"><h2>Daily Target <span>72.6%</span></h2><p>Keep today's usage below 10 kWh</p><div class="progress"><i></i></div><p><b>7.26 kWh used</b> · 2.74 kWh remaining</p></article><article class="panel"><h2>💡 Smart Recommendation</h2><p>AC is your largest load. Reducing runtime could save about ₹180/month.</p><button onclick="page('saving')">View saving tips →</button></article></div>
+<article class="panel"><h2>Quick Appliance Status</h2><div id="quick" class="quick"></div></article>
 </section>
-
-<section id="appliances" class="page">
-  <div class="section-intro"><div><h2>Appliance Monitor</h2><p>Track estimated power consumption for each registered device.</p></div><button class="primary-btn" onclick="addAppliance()">+ Add Appliance</button></div>
-  <div class="appliance-grid" id="applianceGrid"></div>
-</section>
-
-<section id="analytics" class="page">
-  <div class="section-intro"><div><h2>Usage Analytics</h2><p>Understand when and where electricity is being consumed.</p></div></div>
-  <div class="stats-row">
-    <div class="stat"><span>Peak hour</span><b>8:00 PM</b><small>3.42 kW average</small></div>
-    <div class="stat"><span>Weekly usage</span><b>48.7 kWh</b><small>↓ 6.2% from last week</small></div>
-    <div class="stat"><span>Monthly projection</span><b>218 kWh</b><small>₹1,486 estimated</small></div>
-  </div>
-  <article class="panel"><div class="panel-head"><div><h2>Weekly Consumption</h2><p>Last 7 days</p></div></div><canvas id="weeklyChart"></canvas></article>
-</section>
-
-<section id="alerts" class="page">
-  <div class="section-intro"><div><h2>Energy Alerts</h2><p>Potentially wasteful or unusually high usage detected by the monitor.</p></div></div>
-  <div class="alert-list">
-    <div class="alert danger"><b>⚠ High AC consumption</b><span>AC has consumed 3.1 kWh today — 34% above its usual daily average.</span><button onclick="dismiss(this)">Dismiss</button></div>
-    <div class="alert warn"><b>💡 Lights left on</b><span>Bedroom lights have been active for more than 4 hours.</span><button onclick="dismiss(this)">Dismiss</button></div>
-    <div class="alert info"><b>✓ Refrigerator normal</b><span>Refrigerator consumption is within its expected range.</span><button onclick="dismiss(this)">Dismiss</button></div>
-  </div>
-</section>
-
-<section id="saving" class="page">
-  <div class="section-intro"><div><h2>Energy Saving Center</h2><p>Simple changes based on the current simulated usage pattern.</p></div></div>
-  <div class="tips">
-    <article><span>❄️</span><h3>Optimize AC usage</h3><p>Raising the thermostat by 1°C can reduce cooling demand. Use a timer when the room is unoccupied.</p><b>Potential: ₹180/month</b></article>
-    <article><span>💡</span><h3>Switch off idle lights</h3><p>Turn off lights in empty rooms and prefer daylight where possible.</p><b>Potential: ₹65/month</b></article>
-    <article><span>🖥️</span><h3>Reduce standby power</h3><p>Power down computers, monitors and chargers when they are not needed.</p><b>Potential: ₹90/month</b></article>
-  </div>
-  <div class="saving-banner"><div><small>ESTIMATED MONTHLY SAVING</small><strong>₹335</strong></div><p>Following all three recommendations could reduce your projected bill by about 22%.</p></div>
-</section>
-</main>
-<script src="script.js"></script>
-</body>
-</html>
+<section id="appliances" class="view hidden"><div class="intro"><div><h2>Appliance Monitor</h2><p>Track every registered device.</p></div><button onclick="add()">+ Add Appliance</button></div><div id="apps" class="appgrid"></div></section>
+<section id="analytics" class="view hidden"><h2>Usage Analytics</h2><p>Compare weekly consumption and identify peaks.</p><div class="stats"><div>Peak hour<strong>8:00 PM</strong><small>3.42 kW</small></div><div>Weekly usage<strong>48.7 kWh</strong><small>↓ 6.2% from last week</small></div><div>Monthly projection<strong>218 kWh</strong><small>₹1,486 estimated</small></div></div><article class="panel"><h2>Weekly Comparison</h2><div class="chart bigchart"><canvas id="week"></canvas></div></article></section>
+<section id="saving" class="view hidden"><h2>Energy Saving Center</h2><p>Practical recommendations plus an interactive savings calculator.</p><div class="savingcards"><div>❄️<h3>Optimize AC</h3><p>Use a timer and avoid cooling empty rooms.</p><b>Potential: ₹180/month</b></div><div>💡<h3>Switch off idle lights</h3><p>Turn off lights in empty rooms and use daylight.</p><b>Potential: ₹65/month</b></div><div>🖥️<h3>Reduce standby power</h3><p>Power down computers, monitors and chargers.</p><b>Potential: ₹90/month</b></div></div><article class="panel calc"><h2>Saving Calculator</h2><p>Choose a reduction in monthly usage.</p><input type="range" min="0" max="40" value="22" oninput="calc(this.value)"><b id="pct">22%</b><div>Estimated new bill: <strong id="newbill">₹1,159</strong> · <span id="save">Save ₹327/month</span></div></article></section>
+</main><script src="script.js"></script></body></html>
